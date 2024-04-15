@@ -100,3 +100,29 @@ sumaPotencias q n m = f22 n q * f22 m q
 f22 :: Integer -> Integer -> Integer
 f22 1 q = q
 f22 n q = q^n + f22 (n-1) q
+sumaRacionales :: Integer -> Integer -> Float
+sumaRacionales 1 1 = 1
+sumaRacionales p q = auxSumaRacionales p q + auxSumaRacionales2 p q + sumaRacionales (p-1) (q-1)
+{-p/q + auxSumaRacionales p (q-1) + auxSumaRacionales2 (p-1) q-}
+auxSumaRacionales :: Integer -> Integer -> Float
+auxSumaRacionales 1 q = 1 / fromIntegral q
+auxSumaRacionales p q = fromIntegral p / fromIntegral q + auxSumaRacionales (p-1) q
+{- q fijo. fromIntegral te pasa un Int a Float-}
+auxSumaRacionales2 :: Integer -> Integer -> Float
+auxSumaRacionales2 p 1 = fromIntegral p
+auxSumaRacionales2 p q = fromIntegral p / fromIntegral q + auxSumaRacionales2 p (q-1)
+{- p fijo-}
+{-no funciona bien, suma terminos de mas creo, y no termina nunca a veces-}
+menorDivisor :: Integer -> Integer
+menorDivisor 1 = 1
+menorDivisor n = auxDivisores n 2
+auxDivisores :: Integer -> Integer -> Integer
+auxDivisores n k | k == n = n
+                 | mod n k == 0 = k
+                 | otherwise = auxDivisores n (k+1)
+esPrimo :: Integer -> Bool
+esPrimo n = menorDivisor n == n
+sonCoprimos :: Integer -> Integer -> Bool
+sonCoprimos n m | n == 1 || m == 1 = True
+                | mod n (menorDivisor m) == 0 = False
+                | otherwise = sonCoprimos n (div m (menorDivisor m))
