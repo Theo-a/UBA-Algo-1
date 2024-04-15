@@ -121,8 +121,58 @@ auxDivisores n k | k == n = n
                  | mod n k == 0 = k
                  | otherwise = auxDivisores n (k+1)
 esPrimo :: Integer -> Bool
-esPrimo n = menorDivisor n == n
+esPrimo n | n == 1 = False
+          | otherwise = menorDivisor n == n
 sonCoprimos :: Integer -> Integer -> Bool
 sonCoprimos n m | n == 1 || m == 1 = True
                 | mod n (menorDivisor m) == 0 = False
                 | otherwise = sonCoprimos n (div m (menorDivisor m))
+nEsimoPrimo :: Integer -> Integer
+nEsimoPrimo  = auxContador 1
+{- sintaxis rara de vs. en realidad va: nEsimoPrimo n = auxContador 1 n -}
+auxEsPrimo2 :: Integer -> Integer
+auxEsPrimo2 n | esPrimo n = 1
+              | otherwise = 0              
+auxCuantosPrimosHasta :: Integer -> Integer
+auxCuantosPrimosHasta n | n == 1 = 0
+                        | otherwise = auxEsPrimo2 n + auxCuantosPrimosHasta (n-1)
+auxContador :: Integer -> Integer -> Integer
+auxContador q n | auxCuantosPrimosHasta q == n = q
+                | otherwise = auxContador (q+1) n
+{-demasiado codigo, debe ser mejorable-}
+{-
+mayorDigitoPar :: Integer -> Integer
+mayorDigitoPar n | n < 10 && even n = n
+                 | div n 10^(length (show n)) <= 
+-}
+auxLista :: Integer -> [Integer]
+auxLista n | n < 10 && even n = [n]
+           | n < 10 && odd n = [-1]
+           | n == 0 = []
+           | even (div n (10^(length (show n)-1))) = div n (10^length (show n)) : auxLista (mod n (10^(length (show n)-1)))
+           | otherwise = auxLista (mod n (10^(length (show n)-1)))
+{- : es para agragar un elem a lista, ej; 2 : [3] -> [2,3] -}
+{- ej incompleto, la aux intenta meter todos los terminos pares en una lista, para luego usar max o algun metodo asi -}
+esSumaInicialDePrimos :: Integer -> Bool
+esSumaInicialDePrimos n = auxContador2 n 1
+auxEsPrimo3 :: Integer -> Integer
+auxEsPrimo3 n | esPrimo n = n
+              | otherwise = 0              
+auxSumaDePrimosHasta :: Integer -> Integer
+auxSumaDePrimosHasta n | n == 1 = 0
+                       | otherwise = auxEsPrimo3 n + auxSumaDePrimosHasta (n-1)
+auxContador2 :: Integer -> Integer -> Bool
+auxContador2 n q | auxSumaDePrimosHasta q > n = False
+                 | auxSumaDePrimosHasta q == n = True
+                 | otherwise = auxContador2 n (q+1)
+{- funcion pero es muy larga -}
+{- me saltie el ej 17-}
+{-tomaValorMax :: Integer -> Integer -> Integer
+tomaValorMax n1 n2 | n2 < n1 = 0
+                   | sumaDivisores n1 > sumaDivisores (n1 + 1) = -}
+sumaDivisores :: Integer -> Integer -> Integer
+sumaDivisores n q | n == 1 = 1
+                  | q > n = 0
+                  | mod n q == 0 = q + sumaDivisores n (q+1)
+                  | otherwise = sumaDivisores n (q+1)
+{- q es un indice, si arranca de 1 cuneta al 1 como div, sino usar q = 2 -}
