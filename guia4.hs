@@ -42,9 +42,14 @@ sumaDigitos2 n | let q = length (show n)
                | q == 1 = h
                | otherwise = let h = div n 10^(q-1) + div (mod n 10^(q-1)) 10^(q-2)
 -}
-sumaDigitos :: Integer -> Integer
-sumaDigitos n | n < 10 = n
-               | otherwise = div n (10^(length (show n)-1)) + sumaDigitos (mod n (10^(length (show n)-1)))        
+{-
+sumaDigitos3 :: Integer -> Integer
+sumaDigitos3 n | n < 10 = n
+              | otherwise = div n (10^(length (show n)-1)) + sumaDigitos3 (mod n (10^(length (show n)-1)))        
+-}
+sumaDigitos:: Integer -> Integer
+sumaDigitos n | n == 0 = 0
+              | otherwise = mod n 10 + sumaDigitos (div n 10)
 {-
 length (show n) -> gives the lenght of an int, ex: 221 -> 3
 -}
@@ -91,6 +96,7 @@ raizDe2Aprox n = auxiliarRaziDe2 n - 1
 auxiliarRaziDe2 :: Integer -> Float
 auxiliarRaziDe2 1 = 2
 auxiliarRaziDe2 n = 2 + 1 / auxiliarRaziDe2 (n-1)
+{-ej 13-}
 f5 :: Integer -> Float -> Float
 f5 n 1 = f2 n 1
 f5 n q = f2 n q + f5 n (q-1)
@@ -100,19 +106,11 @@ sumaPotencias q n m = f22 n q * f22 m q
 f22 :: Integer -> Integer -> Integer
 f22 1 q = q
 f22 n q = q^n + f22 (n-1) q
-sumaRacionales :: Integer -> Integer -> Float
-sumaRacionales 1 1 = 1
-sumaRacionales p q = auxSumaRacionales p q + auxSumaRacionales2 p q + sumaRacionales (p-1) (q-1)
-{-p/q + auxSumaRacionales p (q-1) + auxSumaRacionales2 (p-1) q-}
-auxSumaRacionales :: Integer -> Integer -> Float
-auxSumaRacionales 1 q = 1 / fromIntegral q
-auxSumaRacionales p q = fromIntegral p / fromIntegral q + auxSumaRacionales (p-1) q
-{- q fijo. fromIntegral te pasa un Int a Float-}
-auxSumaRacionales2 :: Integer -> Integer -> Float
-auxSumaRacionales2 p 1 = fromIntegral p
-auxSumaRacionales2 p q = fromIntegral p / fromIntegral q + auxSumaRacionales2 p (q-1)
-{- p fijo-}
-{-no funciona bien, suma terminos de mas creo, y no termina nunca a veces-}
+sumaRacionales :: Float -> Float -> Float
+sumaRacionales p q | p == 0 = 0
+                   | q == 1 = p
+                   | otherwise = p/q + sumaRacionales (p-1) q + sumaRacionales p (q-1)
+
 menorDivisor :: Integer -> Integer
 menorDivisor 1 = 1
 menorDivisor n = auxDivisores n 2
@@ -140,19 +138,12 @@ auxContador :: Integer -> Integer -> Integer
 auxContador q n | auxCuantosPrimosHasta q == n = q
                 | otherwise = auxContador (q+1) n
 {-demasiado codigo, debe ser mejorable-}
-{-
 mayorDigitoPar :: Integer -> Integer
 mayorDigitoPar n | n < 10 && even n = n
-                 | div n 10^(length (show n)) <= 
--}
-auxLista :: Integer -> [Integer]
-auxLista n | n < 10 && even n = [n]
-           | n < 10 && odd n = [-1]
-           | n == 0 = []
-           | even (div n (10^(length (show n)-1))) = div n (10^length (show n)) : auxLista (mod n (10^(length (show n)-1)))
-           | otherwise = auxLista (mod n (10^(length (show n)-1)))
-{- : es para agragar un elem a lista, ej; 2 : [3] -> [2,3] -}
-{- ej incompleto, la aux intenta meter todos los terminos pares en una lista, para luego usar max o algun metodo asi -}
+                 | even (mod n 10) && mod n 10 >= mayorDigitoPar (div n 10) = mod n 10
+                 | mod n 10 < mayorDigitoPar (div n 10) = mayorDigitoPar (div n 10)
+                 | otherwise = -1
+{-
 esSumaInicialDePrimos :: Integer -> Bool
 esSumaInicialDePrimos n = auxContador2 n 1
 auxEsPrimo3 :: Integer -> Integer
@@ -165,14 +156,30 @@ auxContador2 :: Integer -> Integer -> Bool
 auxContador2 n q | auxSumaDePrimosHasta q > n = False
                  | auxSumaDePrimosHasta q == n = True
                  | otherwise = auxContador2 n (q+1)
+-}
 {- funcion pero es muy larga -}
-{- me saltie el ej 17-}
-{-tomaValorMax :: Integer -> Integer -> Integer
-tomaValorMax n1 n2 | n2 < n1 = 0
-                   | sumaDivisores n1 > sumaDivisores (n1 + 1) = -}
+esFibonacci :: Integer -> Bool
+esFibonacci n = auxEsFibonacci n 1
+auxEsFibonacci:: Integer -> Integer -> Bool
+auxEsFibonacci n i | n == fibonacci i = True
+                   | fibonacci i > n = False
+                   | otherwise = auxEsFibonacci n (i+1)
+esSumaInicialDePrimos :: Integer -> Integer -> Bool
+esSumaInicialDePrimos n i | n == 0 = True
+                          | n < 0 = False
+                          | otherwise = esSumaInicialDePrimos (n - nEsimoPrimo i) (i+1)
+auxtomaValorMax :: Integer -> Integer -> Integer
+auxtomaValorMax n1 n2 | n1 == n2 = n1
+                      | sumaDivisores n1 2 >= sumaDivisores (n2 - 1) 2 = auxtomaValorMax n1 (n2-1)
+                      | otherwise = auxtomaValorMax (n1+1) n2
 sumaDivisores :: Integer -> Integer -> Integer
 sumaDivisores n q | n == 1 = 1
                   | q > n = 0
                   | mod n q == 0 = q + sumaDivisores n (q+1)
                   | otherwise = sumaDivisores n (q+1)
 {- q es un indice, si arranca de 1 cuneta al 1 como div, sino usar q = 2 -}
+pitagoras :: Integer -> Integer -> Integer -> Integer
+pitagoras m n r | m == 0 = 0
+                | n == 0 = 0
+                | m^2 + n^2 <= r^2 = 1 + (pitagoras (m-1) n r)+ (pitagoras m (n-1) r)
+                | otherwise = 0 + (pitagoras (m-1) n r) + (pitagoras m (n-1) r)
