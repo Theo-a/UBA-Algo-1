@@ -31,37 +31,28 @@ medioFact n | n == 0 = 1
             | n == 1 = 1
             | otherwise = medioFact (n-2)*n
 {-esta cumple pero la consigna pero no la formula-}
-{-
-sumaDigitos :: Integer -> Integer
-sumaDigitos n | n < 10 = n
-              | otherwise = div n 100 + div (mod n 100) 10 + mod (mod n 100) 10
--}              
-{-
-sumaDigitos2 :: Integer -> Integer              
-sumaDigitos2 n | let q = length (show n)
-               | q == 1 = h
-               | otherwise = let h = div n 10^(q-1) + div (mod n 10^(q-1)) 10^(q-2)
--}
-{-
-sumaDigitos3 :: Integer -> Integer
-sumaDigitos3 n | n < 10 = n
-              | otherwise = div n (10^(length (show n)-1)) + sumaDigitos3 (mod n (10^(length (show n)-1)))        
--}
 sumaDigitos:: Integer -> Integer
 sumaDigitos n | n == 0 = 0
               | otherwise = mod n 10 + sumaDigitos (div n 10)
 {-
 length (show n) -> gives the lenght of an int, ex: 221 -> 3
 -}
-todosDigitosIguales :: Integer -> Bool
-todosDigitosIguales n | n < 10 = True
-                      | div n (10^(length (show n)-1)) /= div (mod n (10^(length (show n)-1))) 10^(length (show n)-2) = False
-                      | otherwise = todosDigitosIguales (mod n 10^(length (show n)-1))
-{-no se porque no funciona-}
-
+todosDigitosIguales::Int->Bool
+todosDigitosIguales n | n<10 = True
+                      | n<100 = rem n 10==div n 10
+                      | otherwise = todosDigitosIguales (rem n 100) && todosDigitosIguales (div n 10)
 iesimoDigito :: Integer -> Integer -> Integer
 iesimoDigito n i = mod (div n 10^(toInteger (length (show n)) - i)) 10
 {- el toInteger te pasa de Int a Integer, haskell me tomaba el otro como Int y no debajaba restarle i-}
+iesimoDigito2::Integer->Integer->Integer
+iesimoDigito2 n i | i == cantDigitos n = ultimoDigito n
+                  | otherwise = iesimoDigito2 (sacarUltimo n) i
+                  where sacarUltimo n = div n 10
+                        ultimoDigito n = mod n 10
+cantDigitos::Integer->Integer
+cantDigitos n | n<10 =1
+              | otherwise = 1+cantDigitos (sacarUltimo n)
+              where sacarUltimo n = div n 10
 esCapicua3 :: Integer -> Bool
 esCapicua3 n = iesimoDigito n 1 == iesimoDigito n 3
 {-
@@ -179,7 +170,12 @@ sumaDivisores n q | n == 1 = 1
                   | otherwise = sumaDivisores n (q+1)
 {- q es un indice, si arranca de 1 cuneta al 1 como div, sino usar q = 2 -}
 pitagoras :: Integer -> Integer -> Integer -> Integer
-pitagoras m n r | m == 0 = 0
-                | n == 0 = 0
-                | m^2 + n^2 <= r^2 = 1 + (pitagoras (m-1) n r)+ (pitagoras m (n-1) r)
-                | otherwise = 0 + (pitagoras (m-1) n r) + (pitagoras m (n-1) r)
+pitagoras n m r | n==0 = pitagorasNFijo 0 m r
+                | otherwise = pitagorasNFijo n m r + pitagoras (n-1) m r
+esMenorPitagoriano :: Integer->Integer->Integer->Bool
+esMenorPitagoriano p q r = p^2 + q^2 <= r^2
+pitagorasNFijo :: Integer -> Integer -> Integer -> Integer
+pitagorasNFijo n m r | m<0 = 0
+                     | esMenorPitagoriano n m r = 1 + pitagorasNFijo n (m-1) r
+                     | otherwise = 0 + pitagorasNFijo n (m-1) r
+
