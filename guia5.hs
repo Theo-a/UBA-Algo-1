@@ -88,3 +88,98 @@ auxOrdenar :: [Integer] -> [Integer]
 auxOrdenar x | x == [] = []
              | head x >= maximo (tail x) = head x: auxOrdenar (tail x)
              | otherwise = auxOrdenar (tail x ++ [head x])
+--sacarBlancosRepetidos
+sacarEspaciosRepetidos :: [Char] -> [Char]
+sacarEspaciosRepetidos [] = []
+sacarEspaciosRepetidos (x:[]) = [x]
+sacarEspaciosRepetidos (x:y:xs) | x==y && x==' ' = sacarEspaciosRepetidos (y:xs)
+                                | otherwise =  x:(sacarEspaciosRepetidos (y:xs) )
+contarPalabras :: [Char] -> Int
+contarPalabras xs = contarEspacios (sacarEspaciosIniFin (sacarEspaciosRepetidos xs)) + 1
+--saca el primer y el ultimo espacio
+sacarEspaciosIniFin :: [Char] -> [Char]
+sacarEspaciosIniFin [] = []
+sacarEspaciosIniFin (x:xs) | x==' ' = sacarEspacioFin xs
+                           | otherwise = x:(sacarEspacioFin xs) 
+-- saca el ultimo esapcio
+sacarEspacioFin :: [Char] -> [Char]
+sacarEspacioFin [] = []
+sacarEspacioFin (x:[]) | x==' ' = []
+                       | otherwise = [x] 
+sacarEspacioFin (x:xs) = x:(sacarEspacioFin xs)
+contarEspacios :: [Char] -> Int
+contarEspacios [] = 0
+contarEspacios (x:xs) | x==' '= 1 + contarEspacios xs
+                      | otherwise = contarEspacios xs
+palabras :: [Char] -> [[Char]]
+palabras xs = palabrasAux (sacarEspaciosIniFin (sacarEspaciosRepetidos xs))
+
+palabrasAux :: [Char] -> [[Char]]
+palabrasAux [] = []
+palabrasAux (x:xs) = primeraPalabra (x:xs):(palabrasAux (sacarPrimeraPalabra (x:xs)))
+
+primeraPalabra :: [Char] -> [Char]
+primeraPalabra [] = []
+primeraPalabra (x:xs) | x == ' ' = []
+                      | otherwise = x:(primeraPalabra xs)                     
+sacarPrimeraPalabra :: [Char] -> [Char]
+sacarPrimeraPalabra [] = []
+sacarPrimeraPalabra (x:xs) | x == ' ' = xs
+                           | otherwise = sacarPrimeraPalabra xs 
+palabraMasLarga :: [Char] -> [Char]
+palabraMasLarga xs = palabraMasLargaAux (sacarEspaciosIniFin (sacarEspaciosRepetidos xs))
+
+palabraMasLargaAux :: [Char] -> [Char]
+palabraMasLargaAux xs | sacarPrimeraPalabra xs == [] = primeraPalabra xs
+                      | length (primeraPalabra xs) >= length (palabraMasLargaAux (sacarPrimeraPalabra xs)) = primeraPalabra xs
+                      | otherwise = palabraMasLargaAux (sacarPrimeraPalabra xs) 
+aplanar :: [[Char]] -> [Char]
+aplanar [] = []
+aplanar (x:xs) = x ++ (aplanar xs)
+-- obs: "a" ++ "b" -> "ab"
+aplanarConBlancos :: [[Char]] -> [Char]
+aplanarConBlancos x | x == [] = []
+                    | otherwise = head x ++ [' '] ++ aplanarConBlancos (tail x)
+aplanarConNBlancos :: [[Char]] -> Integer -> [Char]
+aplanarConNBlancos x n | x == [] = []
+                       | otherwise = head x ++ auxNespacios n ++ aplanarConBlancos (tail x)
+auxNespacios :: Integer -> [Char]
+auxNespacios n | n == 1 = [' ']
+               | otherwise = ' ' : auxNespacios (n-1)
+sumaAcumulada :: (Num t) => [t] -> [t]
+sumaAcumulada xs | length xs == 1 = xs
+                 | otherwise = sumaAcumulada (principio xs) ++[auxSumarTodos xs]
+-- principio: saca ultimo elem de una lista              
+auxSumarTodos :: (Num t) => [t] -> t
+auxSumarTodos xs | length xs == 1 = head xs
+                 | otherwise = head xs + auxSumarTodos (tail xs)
+descomponerEnPrimos :: [Integer] -> [[Integer]]
+descomponerEnPrimos xs | length xs == 1 = [auxFactorizar (head xs) 1]
+                       | otherwise = auxFactorizar (head xs) 1 : descomponerEnPrimos (tail xs)
+auxFactorizar :: Integer -> Integer -> [Integer]
+auxFactorizar n i | n == 1 = []
+                  | mod n (nEsimoPrimo i) == 0 = nEsimoPrimo i:auxFactorizar (div n (nEsimoPrimo i)) i 
+                  | otherwise = auxFactorizar n (i+1)
+
+nEsimoPrimo :: Integer -> Integer
+nEsimoPrimo  = auxContador 1
+{- sintaxis rara de vs. en realidad va: nEsimoPrimo n = auxContador 1 n -}
+auxEsPrimo2 :: Integer -> Integer
+auxEsPrimo2 n | esPrimo n = 1
+              | otherwise = 0              
+auxCuantosPrimosHasta :: Integer -> Integer
+auxCuantosPrimosHasta n | n == 1 = 0
+                        | otherwise = auxEsPrimo2 n + auxCuantosPrimosHasta (n-1)
+auxContador :: Integer -> Integer -> Integer
+auxContador q n | auxCuantosPrimosHasta q == n = q
+                | otherwise = auxContador (q+1) n
+esPrimo :: Integer -> Bool
+esPrimo n | n == 1 = False
+          | otherwise = menorDivisor n == n
+menorDivisor :: Integer -> Integer
+menorDivisor 1 = 1
+menorDivisor n = auxDivisores n 2
+auxDivisores :: Integer -> Integer -> Integer
+auxDivisores n k | k == n = n
+                 | mod n k == 0 = k
+                 | otherwise = auxDivisores n (k+1)
