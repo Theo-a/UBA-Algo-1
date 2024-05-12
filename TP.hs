@@ -30,11 +30,30 @@ cifrar [] n = []
 cifrar s n | esMinuscula (head s) = desplazar (head s) n : cifrar (tail s) n
            | otherwise = head s : cifrar (tail s) n
 
-descifrar :: String -> Int -> String
-descifrar [] n = []
-descifrar s n | esMinuscula (head s) = desplazar2 (head s) n : descifrar (tail s) n
-              | otherwise = head s : descifrar (tail s) n
-desplazar2 :: Char -> Int -> Char
-desplazar2 c n | not (esMinuscula c) = c
-               | otherwise = auxDesplazar c n (reverso['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'])
---el problema esta en auxDesplazar
+descifrar :: String -> Int -> [Char] -> String
+descifrar [] n  l= []
+descifrar s n l| esMinuscula (head s) = desplazar 'a' (abs (auxLetraANatural (head s) l - n)): descifrar (tail s) n l
+               | otherwise = head s : descifrar (tail s) n l
+
+descifrar2 :: String -> Int -> String
+descifrar2 s n = descifrar s n ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+
+cifrarLista :: [String] -> [String]
+cifrarLista  [] = []
+cifrarLista ls = auxCifrarLista ls 0
+auxCifrarLista :: [String] -> Int -> [String]
+auxCifrarLista [] i = []
+auxCifrarLista ls i = cifrar (head ls) i : auxCifrarLista (tail ls) (i+1)
+
+frecuencia :: String -> [Float]
+frecuencia s = auxFrecuencia s ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+auxFrecuencia :: String -> [Char] -> [Float]
+auxFrecuencia s [] = []
+auxFrecuencia s l| esMinuscula (head s) = auxCantidadChar (head l) s / fromIntegral (length s) : auxFrecuencia s (tail l)
+                 | otherwise = 0 : auxFrecuencia s (tail l)
+--funciona pero los decimales no son iguales al ejemplo
+auxCantidadChar :: Char -> String -> Float
+auxCantidadChar c [] = 0
+auxCantidadChar c s | c == head s = 1 + auxCantidadChar c (tail s)
+                    | otherwise = auxCantidadChar c (tail s)
+                    
