@@ -1,162 +1,144 @@
+module Solucion where
 import Data.Char
+-- No se permite agrear nuevos imports
+-- Sólo está permitido usar estas funciones:
+-- https://campus.exactas.uba.ar/pluginfile.php/557895/mod_resource/content/1/validas_tp.pdf
 
+
+-- Completar!
+-- Nombre de grupo: { lukitas un gusto }
+-- Integrante1: { 46502947,Badii Marina }
+-- Integrante2: { 44613453,Banquero Albarracin Theo }
+-- Integrante3: { 43722634,D'Alessio María José }
+-- Integrante4: { 42997261,Fassl Agustin Lucas }
+-- Integrantes que abandonaron la materia: {En caso que haya abandonado la materia algún
+                        -- integrante, completar con los dni y apellidos, sino dejar vacío}
+
+-- EJ 1
 esMinuscula :: Char -> Bool
-esMinuscula c = auxEsMinuscula c ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-auxEsMinuscula :: Char -> [Char] -> Bool
-auxEsMinuscula c [] = False
-auxEsMinuscula c l | c == head l = True
-                   | otherwise = auxEsMinuscula c (tail l)
+esMinuscula c = ord c >= 97 && ord c <= 122
 
+-- EJ 2
 letraANatural :: Char -> Int
-letraANatural c = auxLetraANatural c ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-auxLetraANatural :: Char -> [Char] -> Int
-auxLetraANatural c l | c == head l = 0
-                     | otherwise = auxLetraANatural c (tail l) + 1
--- no hace falta caso l = [] porque nunca se llegaría al mismo (la función requiere esMinuscula)
+letraANatural c = ord c - 97
 
-desplazar :: Char -> Int -> Char 
-desplazar c n | not (esMinuscula c) = c
-               | ((ord c)+n)> 122 = desplazar c (n-26)
-               |((ord c)+n)<97 = desplazar c (n+26)
-               | otherwise =  chr ((ord c)+n)
-{-
+-- EJ 3
 desplazar :: Char -> Int -> Char
 desplazar c n | not (esMinuscula c) = c
-              | otherwise = auxDesplazar c n ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-auxDesplazar :: Char -> Int -> [Char] -> Char
-auxDesplazar c n l | letraANatural c + n <= length l - 1 = auxNaturalALetra (letraANatural c + n) l
-                   | otherwise = auxDesplazar c (n- length l) (reverso l)
-auxNaturalALetra :: Int -> [Char] -> Char
-auxNaturalALetra n l | n == 0 = head l
-                     | otherwise = auxNaturalALetra (n-1) (tail l)
-naturalAletra :: Int -> Char
-naturalAletra n = auxNaturalALetra n ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-reverso :: [t] -> [t]
-reverso [] = []
-reverso (x:xs) = reverso xs ++ [x]
--}
+              | (ord c + n) > 122 = desplazar c (n - 26)
+              | (ord c + n) < 97 = desplazar c (n + 26)
+              | otherwise = chr (ord c + n)
+
+-- EJ 4
 cifrar :: String -> Int -> String
-cifrar [] n = []
-cifrar s n | esMinuscula (head s) = desplazar (head s) n : cifrar (tail s) n
-           | otherwise = head s : cifrar (tail s) n
+cifrar [] _ = []
+cifrar (letra:palabra) n | esMinuscula letra = desplazar letra n : cifrar palabra n
+                         | otherwise = letra : cifrar palabra n
 
-descifrar2 :: String -> Int -> [Char] -> String
-descifrar2 [] n  l= []
-descifrar2 s n l| esMinuscula (head s) = desplazar 'a' (abs (auxLetraANatural (head s) l - n)): descifrar2 (tail s) n l
-                | otherwise = head s : descifrar2 (tail s) n l
-
+-- EJ 5
 descifrar :: String -> Int -> String
-descifrar s n = descifrar2 s n ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+descifrar [] _ = []
+descifrar (letra:frase) n | esMinuscula letra = desplazar letra (-n) : descifrar frase n
+                          | otherwise = letra : descifrar frase n
 
+-- EJ 6
 cifrarLista :: [String] -> [String]
-cifrarLista  [] = []
+cifrarLista [] = []
 cifrarLista ls = auxCifrarLista ls 0
+
 auxCifrarLista :: [String] -> Int -> [String]
-auxCifrarLista [] i = []
-auxCifrarLista ls i = cifrar (head ls) i : auxCifrarLista (tail ls) (i+1)
+auxCifrarLista [] _ = []
+auxCifrarLista (l:ls) i = cifrar l i : auxCifrarLista ls (i+1)
 
+-- EJ 7
 frecuencia :: String -> [Float]
-frecuencia s = auxFrecuencia s ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-auxFrecuencia :: String -> [Char] -> [Float]
-auxFrecuencia s [] = []
-auxFrecuencia s l| esMinuscula (head s) = auxCantidadChar (head l) s / fromIntegral (length s) : auxFrecuencia s (tail l)
-                 | otherwise = 0 : auxFrecuencia s (tail l)
---funciona pero los decimales no son iguales al ejemplo
-auxCantidadChar :: Char -> String -> Float
-auxCantidadChar c [] = 0
-auxCantidadChar c s | c == head s = 1 + auxCantidadChar c (tail s)
-                    | otherwise = auxCantidadChar c (tail s)
-{-
-cifradoMasFrecuente :: String -> Int -> (Char,Float)
-cifradoMasFrecuente [] n = (' ',0)
-cifradoMasFrecuente s n | auxFrecChar2 (head (cifrar s n)) (cifrar s n) >= auxFrecChar2 (fst (cifradoMasFrecuente (tail s) n)) (cifrar (tail s) n) = (head (cifrar s n),auxFrecChar2 (head (cifrar s n)) (cifrar s n) )
-                        | otherwise = cifradoMasFrecuente (tail s) n
-no funciona bien, da mal la frecuencia
--}
-cifradoMasFrecuente :: String -> Int -> (Char,Float)
-cifradoMasFrecuente [] n = (' ',0)
-cifradoMasFrecuente s n | auxFrecChar2 (head (cifrar s n)) (cifrar s n) == maxx (frecuencia (cifrar s n)) = (head (cifrar s n),auxFrecChar2 (head (cifrar s n)) (cifrar s n))
-                        | otherwise = cifradoMasFrecuente (tail s) n
--- anda mal
-auxFrecChar :: Char -> String -> Float
-auxFrecChar c [] = 0
-auxFrecChar c s | c == head s = 1 + auxFrecChar c (tail s)
-                | otherwise = auxFrecChar c (tail s)
-auxFrecChar2 :: Char -> String -> Float
-auxFrecChar2 c s = auxFrecChar c s / fromIntegral (length s)
-maxx :: (Ord t) => [t] -> t
-maxx [x] = x 
-maxx xs | head xs >= maxx (tail xs) = head xs
-        | otherwise = maxx (tail xs)
+frecuencia s = porcentajeMinusculas s (ord 'a')
 
+porcentajeMinusculas :: String -> Int -> [Float]
+porcentajeMinusculas _ letra | letra > 122 = []
+porcentajeMinusculas s letra | cantidadMinusculas s == 0 = 0:porcentajeMinusculas s (letra + 1)
+                             | otherwise = ((cantidadChar s (chr letra) / cantidadMinusculas s) * 100): porcentajeMinusculas s (letra + 1)
+
+cantidadChar :: String -> Char -> Float
+cantidadChar [] _ = 0
+cantidadChar (letra:frase) c | letra == c = 1 + cantidadChar frase c
+                             | otherwise = cantidadChar frase c
+
+cantidadMinusculas :: String -> Float
+cantidadMinusculas [] = 0
+cantidadMinusculas (letra:frase) | esMinuscula letra = 1 + cantidadMinusculas frase
+                                 | otherwise = cantidadMinusculas frase
+
+-- Ej 8
+cifradoMasFrecuente :: String -> Int -> (Char, Float)
+cifradoMasFrecuente s n = mayorFrecuencia (frecuencia (cifrar s n)) [(ord 'a'),(ord 'b')]
+
+mayorFrecuencia :: [Float] -> [Int] -> (Char, Float)
+mayorFrecuencia [a] [min1,min2] = (chr min1,a)
+mayorFrecuencia (a:b:c) [min1,min2] | a >= b = mayorFrecuencia (a:c) [min1,min2 + 1]
+                                    | otherwise = mayorFrecuencia (b:c) [min2, min2 + 1]
+
+-- EJ 9
 esDescifrado :: String -> String -> Bool
-esDescifrado s1 s2 = auxEsDecifrado s1 s2 0
+esDescifrado s1 s2 | length s1 /= length s2 = False
+                   | cantidadMinusculas s1 /= cantidadMinusculas s2 = False
+                   | otherwise = auxEsDecifrado s1 s2 0
+
 auxEsDecifrado :: String -> String -> Int -> Bool
-auxEsDecifrado s1 s2 n | length s1 /= length s2 = False
+auxEsDecifrado s1 s2 n | n == 26 = False
                        | s2 == cifrar s1 n = True
-                       | n == 26 = False
                        | otherwise = auxEsDecifrado s1 s2 (n+1)
 
-todosLosDecifrados :: [String] -> [(String,String)]
-todosLosDecifrados [] = []
-todosLosDecifrados (x:xs) = auxTodosLosDec x xs ++ todosLosDecifrados xs
-auxTodosLosDec :: String -> [String] -> [(String,String)]
-auxTodosLosDec s [] = []
-auxTodosLosDec s ls | auxEsDecifrado s (head ls) 1 = (s,head ls) : auxTodosLosDec s (tail ls)
-                    | otherwise = auxTodosLosDec s (tail ls)
-
-expandirClave :: String -> Int -> String
-expandirClave xs n = auxExpandirClave xs xs n
-auxExpandirClave :: String -> String -> Int -> String
-auxExpandirClave ys xs 0 = []
-auxExpandirClave [] xs n = auxExpandirClave xs xs n
-auxExpandirClave ys xs n = [head ys] ++ auxExpandirClave (tail ys) xs (n-1)
-
--- codigo robado
-desplazar3 :: Char -> Int -> Char 
-desplazar3 c n | not (esMinuscula c) = c
-               | ((ord c)+n)> 122 = desplazar3 c (n-26)
-               |((ord c)+n)<97 = desplazar3 c (n+26)
-               | otherwise =  chr ((ord c)+n)
-
+-- EJ 10
 todosLosDescifrados :: [String] -> [(String, String)]
 todosLosDescifrados [] = []
-todosLosDescifrados (x:xs) =   todosLosDescifrados xs ++ todosLosDescifradosAux x (xs)
+todosLosDescifrados (x:xs) | cantidadMinusculas x == 0 = [(x,x)] ++ todosLosDescifrados xs
+                           | otherwise = todosLosDescifradosAux x xs ++ todosLosDescifrados xs
 
 todosLosDescifradosAux :: String-> [String] -> [(String, String)]
 todosLosDescifradosAux _ [] = []
-todosLosDescifradosAux c (x:xs) | (esDescifrado c x) = todosLosDescifradosAux c xs ++ [(c, x) , (x, c)] 
+todosLosDescifradosAux c (x:xs) | esDescifrado c x = [(c, x) , (x, c)] ++ todosLosDescifradosAux c xs
                                 | otherwise = todosLosDescifradosAux c xs
 
+-- EJ 11
+expandirClave :: String -> Int -> String
+expandirClave clave n = expandirClaveAux clave n clave
+
+expandirClaveAux :: String -> Int -> String -> String
+expandirClaveAux _ 0 _ = []
+expandirClaveAux [] n clave = expandirClaveAux clave n clave
+expandirClaveAux (x:xs) n clave = x : expandirClaveAux xs (n-1) clave
+
+-- EJ 12
 cifrarVigenere :: String -> String -> String
-cifrarVigenere ls clave = cifrarVigenereAux ls  (expandirClave clave (length (ls)))
+cifrarVigenere s clave = cifrarVigenereAux s (expandirClave clave (length s)) 1
 
-cifrarVigenereAux :: String -> String -> String
-cifrarVigenereAux [] [] = []
-cifrarVigenereAux (x:xs) (n:ns) = [desplazar3 x ((ord n)-97)] ++ cifrarVigenereAux xs ns
+cifrarVigenereAux :: String -> String -> Int -> String
+cifrarVigenereAux [] [] _ = []
+cifrarVigenereAux (x:xs) (n:ns) i = desplazar x ((ord n - 97) * i) : cifrarVigenereAux xs ns i
 
+-- EJ 13
 descifrarVigenere :: String -> String -> String
-descifrarVigenere ls clave = descifrarVigenereAux ls  (expandirClave clave (length (ls)))
+descifrarVigenere ls clave = cifrarVigenereAux ls (expandirClave clave (length ls)) (-1)
 
-descifrarVigenereAux :: String -> String -> String
-descifrarVigenereAux [] [] = []
-descifrarVigenereAux (x:xs) (n:ns) = [desplazar3 x ((ord n - 97)* (-1))] ++ descifrarVigenere xs ns
-
--- fin de codigo robado
-
+-- EJ 14
 peorCifrado :: String -> [String] -> String
-peorCifrado s (x:xs) | auxDistanciaSec s (cifrarVigenere s x) >= auxDistanciaSec s (peorCifrado s xs) = x
-                     | otherwise = peorCifrado s xs
+peorCifrado _ [clave] = clave
+peorCifrado s (clave1:clave2:claves) | auxDistanciaSec s (cifrarVigenere s clave1) <= auxDistanciaSec s (cifrarVigenere s clave2) = peorCifrado s (clave1:claves)
+                                     | otherwise = peorCifrado s (clave2:claves)
 
 auxDistanciaSec :: String -> String -> Int
 auxDistanciaSec [] [] = 0
-auxDistanciaSec s1 s2 = abs (letraANatural (head s1) - letraANatural (head s2)) + auxDistanciaSec (tail s1) (tail s2)
+auxDistanciaSec (s1:s1s) (s2:s2s) | (letraANatural s1 - letraANatural s2) < 0 = - (letraANatural s1 - letraANatural s2) + auxDistanciaSec s1s s2s
+                                  | otherwise = (letraANatural s1 - letraANatural s2) + auxDistanciaSec s1s s2s
 
-combinacionesVigenere :: [String] -> [String] -> String -> [(String,String)]
-combinacionesVigenere [] claves cifrado = []
-combinacionesVigenere msjs claves cifrado = auxCombVig (head msjs) claves cifrado ++ combinacionesVigenere (tail msjs) claves cifrado
+-- EJ 15
+combinacionesVigenere :: [String] -> [String] -> String -> [(String, String)]
+combinacionesVigenere [] _ _ = []
+combinacionesVigenere (msj:msjs) claves cifrado = auxCombVig msj claves cifrado ++ combinacionesVigenere msjs claves cifrado
 
 auxCombVig :: String -> [String] -> String -> [(String,String)]
-auxCombVig msj [] cifrado = []
-auxCombVig msj claves cifrado | cifrarVigenere msj (head claves) == cifrado = (msj,head claves) : auxCombVig msj (tail claves) cifrado
-                              | otherwise = auxCombVig msj (tail claves) cifrado
+auxCombVig _ [] _ = []
+auxCombVig msj (clave:claves) cifrado | cifrarVigenere msj clave == cifrado = (msj,clave) : auxCombVig msj claves cifrado
+                                      | otherwise = auxCombVig msj claves cifrado
+
