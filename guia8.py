@@ -31,7 +31,7 @@ def existe_palabra(palabra: str, texto: str) -> bool:
     archivo = open(texto , "r")
     contenido: str = archivo.read()
     archivo.close()
-    return pertenece_palabra_aux(palabra, contenido)
+    return pertenece_palabra(palabra, contenido)
 
 #ejercicio 1.3
 def cantidad_aprariciones_aux(texto:str,palabra:str)->int:
@@ -111,7 +111,7 @@ def listar_palabras_de_archivo(texto:str)->List[str]:
 
     for byte in file_bytes:
         caracter = chr(byte)
-        if es_leible(caracter):
+        if es_legible(caracter):
             palabra_legible += caracter
         else:
             if len(palabra_legible) >= 5:
